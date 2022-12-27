@@ -15,11 +15,13 @@ public class CommandRegisterer {
         this.folderName = folderName;
     }
 
-    public void registerEvents() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public void registerCommands() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         for(Class<? extends CommandHandler> clazz: new Reflections(packageName + "." + folderName)
                 .getSubTypesOf(CommandHandler.class)) {
             CommandHandler commandHandler = clazz.getDeclaredConstructor().newInstance();
             plugin.getCommand(commandHandler.getCommandInfo().name()).setExecutor(commandHandler);
+
+            plugin.getLogger().info("Registered command " + commandHandler.getCommandInfo().name());
         }
     }
 }
