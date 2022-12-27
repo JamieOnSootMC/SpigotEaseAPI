@@ -6,13 +6,13 @@ import org.reflections.Reflections;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class EventRegister {
+public class EventRegisterer {
 
     private final JavaPlugin plugin;
     private final String packageName;
     private final String folderName;
 
-    public EventRegister(JavaPlugin plugin, String packageName, String folderName) {
+    public EventRegisterer(JavaPlugin plugin, String packageName, String folderName) {
         this.plugin = plugin;
         this.packageName = packageName;
         this.folderName = folderName;
