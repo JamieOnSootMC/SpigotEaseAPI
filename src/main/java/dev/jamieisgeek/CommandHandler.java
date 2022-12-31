@@ -9,10 +9,12 @@ import java.util.Objects;
 
 public abstract class CommandHandler implements CommandExecutor {
     private final CommandInfo commandInfo;
+    private final Arguments argumentInfo;
 
     public CommandHandler() {
         this.commandInfo = getClass().getDeclaredAnnotation(CommandInfo.class);
         Objects.requireNonNull(commandInfo, "CommandInfo annotation is required for CommandHandler");
+        this.argumentInfo = getClass().getDeclaredAnnotation(Arguments.class);
     }
 
     public CommandInfo getCommandInfo() {
@@ -37,6 +39,62 @@ public abstract class CommandHandler implements CommandExecutor {
 
         execute(sender, args);
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+        if (argumentInfo == null) {
+            return null;
+        }
+        if(args.length == 0) {
+            return null;
+        }
+        if (args.length > argumentInfo.value().length) {
+            return null;
+        }
+        Argument argument = argumentInfo.value()[args.length - 1];
+        List<String> options = new ArrayList<>();
+        switch(argument.Type().toLowerCase()) {
+            case "string":
+            case "int":
+            case "double":
+                options = new ArrayList<>();
+                options.add("");
+                return options;
+            case "option":
+                options = new ArrayList<>();
+                for (String option : argument.Options()) {
+                    if (option.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) {
+                        options.add(option);
+                    }
+                }
+                return options;
+            case "boolean":
+                options = new ArrayList<>();
+                options.add("true");
+                options.add("false");
+                return options;
+            case "material":
+                options = new ArrayList<>();
+                for (Material material : Material.values()) {
+                    if (material.name().toLowerCase().startsWith(args[args.length - 1].toLowerCase())) {
+                        options.add(material.name());
+                    }
+                }
+                return options;
+            case "entity":
+                options = new ArrayList<>();
+                for (EntityType entityType : EntityType.values()) {
+                    if (entityType.name().toLowerCase().startsWith(args[args.length - 1].toLowerCase())) {
+                        options.add(entityType.name());
+                    }
+                }
+                return options;
+            case "player":
+            default:
+                return null;
+        }
+
     }
 
     public void execute(Player player, String[] args) {
